@@ -1,12 +1,13 @@
 const express = require('express')
 const Serie = require('../models/serie')
+const Auth = require('../controllers/auth')
 
 const router = express.Router()
 
-/*const series = [
-    {name: 'Breaking Bad'},
-    {name: 'Narcos'}
-]*/
+//middleware de auth
+router.use(async(req, res, next) => {
+    Auth.checkRole(req, res, next, 'restrito')
+})
 
 router.get('/', async(req, res) => {
     const series = await Serie.find()
@@ -42,7 +43,7 @@ router.delete('/:id', async(req, res) => {
             success: true
         })
     } catch (e) {
-         res.send({
+        res.send({
             success: false,
             errors: Object.keys(e.errors)
         })
@@ -51,7 +52,7 @@ router.delete('/:id', async(req, res) => {
 })
 
 router.put('/:id', async(req, res) => {
-    
+
     const serie = await Serie.findOne({_id: req.params.id})
     serie.name = req.body.name
     serie.status = req.body.status
